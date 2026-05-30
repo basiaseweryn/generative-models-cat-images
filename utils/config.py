@@ -24,7 +24,7 @@ def seed_everything(seed: int = 42) -> None:
 #   DOGS_VS_CATS_DIR = "./data/dogs_vs_cats"
 #
 # Kaggle example (uncomment when running on Kaggle):
-DATA_DIR = "/kaggle/input/cat-dataset"
+DATA_DIR = "/kaggle/input/datasets/crawford/cat-dataset"
 DOGS_VS_CATS_DIR = "/kaggle/input/dogs-vs-cats-redux-kernels-edition"
 
 
