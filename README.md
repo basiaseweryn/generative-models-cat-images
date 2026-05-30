@@ -2,21 +2,6 @@
 
 Deep Learning project 3 — compare **VAE** and **DCGAN** for cat image generation (WUT Data Science).
 
-## Project layout
-
-```
-generative-models-cat-images/
-├── experiments.ipynb      # run training & evaluation here
-├── utils/
-│   ├── config.py          # paths, seeds, EXPERIMENTS dict
-│   ├── data_utils.py      # datasets & dataloaders
-│   ├── models.py          # VAE + DCGAN architectures
-│   └── evaluation_utils.py  # FID, plots, interpolation, checkpoints
-├── data/                  # put datasets here (not in git)
-├── trained_models/        # saved checkpoints (not in git)
-└── outputs/               # figures & grids (not in git)
-```
-
 ## Setup
 
 ```bash
@@ -38,11 +23,3 @@ Open `experiments.ipynb`, set `SCENARIO` to a key from `EXPERIMENTS` in `utils/c
 | 3 | interpolation cell after training |
 | 4 | `stage_4_dcgan_n_critic_5`, `stage_4_dcgan_instance_noise` |
 | 5 | `stage_5_dcgan_cats_dogs`, `stage_5_vae_cats_dogs` |
-
-## Metrics & rubric helpers
-
-- **FID (2000 samples)** — `compare_fid_scenarios()` saves CSV under `outputs/reports/`
-- **Qualitative** — `generate_candidate_grid()` + saved PNGs
-- **Interpolation** — pick `IDX_A` / `IDX_B`, save `interpolation_latents.pth`, 10-image grid
-- **Mode collapse** — `compare_mode_collapse_scenarios()` flags low diversity
-- **Cats vs cats+dogs** — `compare_cats_vs_cats_dogs()` side-by-side FID + grids
