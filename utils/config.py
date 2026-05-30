@@ -18,15 +18,13 @@ def seed_everything(seed: int = 42) -> None:
     print(f"Random seed set to {seed}")
 
 
-# ---------------------------------------------------------------------------
-# Paths — change these to match your machine / Kaggle dataset layout
-# ---------------------------------------------------------------------------
+# Paths
 # Local example:
 #   DATA_DIR = "./data/cats"
 #   DOGS_VS_CATS_DIR = "./data/dogs_vs_cats"
 #
 # Kaggle example (uncomment when running on Kaggle):
-DATA_DIR = "/kaggle/input/cats-dataset"
+DATA_DIR = "/kaggle/input/cat-dataset"
 DOGS_VS_CATS_DIR = "/kaggle/input/dogs-vs-cats-redux-kernels-edition"
 
 
