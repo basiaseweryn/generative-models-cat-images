@@ -24,10 +24,6 @@ from utils.models import get_model, sample_dcgan, sample_vae, sample_with_latent
 # Below this diversity score, generations may indicate mode collapse (tune after first run)
 MODE_COLLAPSE_DIVERSITY_THRESHOLD = 5.0
 
-
-# ---------------------------------------------------------------------------
-# Saving / visualization
-# ---------------------------------------------------------------------------
 def denormalize_dcgan(images: torch.Tensor) -> torch.Tensor:
     """Map [-1, 1] -> [0, 1] for plotting."""
     return (images * 0.5 + 0.5).clamp(0, 1)
@@ -57,9 +53,8 @@ def show_image_grid(images: torch.Tensor, title: str = "", nrow: int = 8):
     plt.show()
 
 
-# ---------------------------------------------------------------------------
+
 # FID (Fréchet Inception Distance)
-# ---------------------------------------------------------------------------
 class InceptionFeatureExtractor(nn.Module):
     """Inception v3 up to the last pooling layer (2048-d features)."""
 
@@ -73,7 +68,7 @@ class InceptionFeatureExtractor(nn.Module):
             p.requires_grad = False
 
     def forward(self, x):
-        # Inception expects 299x299 and ImageNet normalization
+        #Inception expects 299x299 and ImageNet normalization
         return self.model(x)
 
 
@@ -146,9 +141,7 @@ def fid_from_dataloader(
     return compute_fid(real_t, fake_t, device)
 
 
-# ---------------------------------------------------------------------------
-# Latent space interpolation (plan stage 3)
-# ---------------------------------------------------------------------------
+#Latent space interpolation (plan stage 3)
 @torch.no_grad()
 def interpolate_vae(
     model,
@@ -194,9 +187,7 @@ def save_interpolation_grid(
     save_sample_grid(images, filepath, nrow=images.size(0))
 
 
-# ---------------------------------------------------------------------------
-# Mode collapse helpers (plan stage 4)
-# ---------------------------------------------------------------------------
+#Mode collapse helpers (plan stage 4)
 @torch.no_grad()
 def feature_diversity_score(features: np.ndarray) -> float:
     """
@@ -225,9 +216,8 @@ def evaluate_mode_collapse(
     }
 
 
-# ---------------------------------------------------------------------------
-# Checkpoints
-# ---------------------------------------------------------------------------
+
+#Checkpoints
 def save_checkpoint(
     path: str,
     model: nn.Module,
@@ -263,9 +253,7 @@ def output_path(scenario_name: str, filename: str) -> str:
     return path
 
 
-# ---------------------------------------------------------------------------
-# Model loading & scenario-level evaluation
-# ---------------------------------------------------------------------------
+#Model loading & scenario-level evaluation
 def load_trained_model(scenario_name: str, device: torch.device):
     """Load checkpoint for a scenario from trained_models/."""
     config = EXPERIMENTS[scenario_name].copy()
@@ -364,9 +352,8 @@ def print_fid_table(rows: list):
         )
 
 
-# ---------------------------------------------------------------------------
-# Interpolation from selected generated images (project guideline)
-# ---------------------------------------------------------------------------
+
+#Interpolation from selected generated images (project guideline)
 @torch.no_grad()
 def generate_candidate_grid(
     model,
@@ -420,9 +407,7 @@ def interpolate_between_latents(
     return _to_display_images(images, config), images, is_dcgan
 
 
-# ---------------------------------------------------------------------------
-# Mode collapse: detect & compare mitigations
-# ---------------------------------------------------------------------------
+#Mode collapse: detect & compare mitigations
 @torch.no_grad()
 def evaluate_mode_collapse_scenario(
     scenario_name: str,
@@ -458,9 +443,7 @@ def compare_mode_collapse_scenarios(scenario_names: list, device: torch.device) 
     return results
 
 
-# ---------------------------------------------------------------------------
-# Stage 5: cats-only vs cats+dogs comparison
-# ---------------------------------------------------------------------------
+#Stage 5: cats-only vs cats+dogs comparison
 @torch.no_grad()
 def compare_cats_vs_cats_dogs(
     scenario_cats_only: str,

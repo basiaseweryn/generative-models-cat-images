@@ -26,18 +26,15 @@ def seed_everything(seed: int = 42) -> None:
 #   DOGS_VS_CATS_DIR = "./data/dogs_vs_cats"
 #
 # Kaggle example (uncomment when running on Kaggle):
-#   DATA_DIR = "/kaggle/input/cats-dataset"
-#   DOGS_VS_CATS_DIR = "/kaggle/input/dogs-vs-cats-redux-kernels-edition"
+DATA_DIR = "/kaggle/input/cats-dataset"
+DOGS_VS_CATS_DIR = "/kaggle/input/dogs-vs-cats-redux-kernels-edition"
 
-DATA_DIR = "./data/cats"
-DOGS_VS_CATS_DIR = "./data/dogs_vs_cats"
 
 TRAINED_MODELS_DIR = "./trained_models/"
 OUTPUT_DIR = "./outputs/"
 
-# ---------------------------------------------------------------------------
-# Global hyperparameters
-# ---------------------------------------------------------------------------
+#Global hyperparameters
+
 IMAGE_SIZE = 64
 LATENT_DIM = 128
 RANDOM_SEED = 42
@@ -64,10 +61,7 @@ STAGE_4_SCENARIOS = [
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
-# ---------------------------------------------------------------------------
-# Experiment definitions (aligned with plan sections 4–5)
-# Each entry is one runnable scenario. Keys are used as folder names for checkpoints.
-# ---------------------------------------------------------------------------
+# Experiment definitions
 EXPERIMENTS = {
     # Stage 1 — baseline VAE and DCGAN on preprocessed cats
     "stage_1_vae": {
