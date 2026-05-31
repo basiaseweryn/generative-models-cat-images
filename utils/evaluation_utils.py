@@ -253,16 +253,44 @@ def output_path(scenario_name: str, filename: str) -> str:
     return path
 
 
-#Model loading & scenario-level evaluation
+# Model loading & scenario-level evaluation
+def _config_from_state_dict(state_dict: dict, base_config: dict) -> dict:
+    """Detect VAE vs DCGAN (and latent_dim) from checkpoint weights."""
+    config = base_config.copy()
+    keys = list(state_dict.keys())
+
+    if any(k.startswith("encoder.") for k in keys):
+        config["model"] = "vae"
+        if "fc_mu.weight" in state_dict:
+            config["latent_dim"] = int(state_dict["fc_mu.weight"].shape[0])
+    elif any(k.startswith("generator.") for k in keys):
+        config["model"] = "dcgan"
+        w = state_dict.get("generator.main.0.weight")
+        if w is not None:
+            config["latent_dim"] = int(w.shape[0])
+
+    return config
+
+
 def load_trained_model(scenario_name: str, device: torch.device):
-    """Load checkpoint for a scenario from trained_models/."""
-    config = EXPERIMENTS[scenario_name].copy()
-    model = get_model(config["model"], config).to(device)
+    """Load checkpoint from trained_models/<scenario>/model.pth."""
+    base_config = EXPERIMENTS[scenario_name].copy()
     ckpt_path = os.path.join(TRAINED_MODELS_DIR, scenario_name, "model.pth")
     if not os.path.exists(ckpt_path):
         raise FileNotFoundError(f"No checkpoint at {ckpt_path}. Train '{scenario_name}' first.")
+
     ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
-    model.load_state_dict(ckpt["model_state_dict"])
+    state_dict = ckpt["model_state_dict"]
+    config = _config_from_state_dict(state_dict, base_config)
+
+    if config["model"] != base_config["model"]:
+        print(
+            f"WARNING [{scenario_name}]: expected {base_config['model']} "
+            f"but checkpoint is {config['model']} — using checkpoint type."
+        )
+
+    model = get_model(config["model"], config).to(device)
+    model.load_state_dict(state_dict)
     model.eval()
     return model, config, ckpt.get("history", {})
 
@@ -302,7 +330,7 @@ def evaluate_fid_scenario(
         loader, generate_fn, device, max_real=max_samples, max_fake=max_samples
     )
     print(f"FID [{scenario_name}] ({max_samples} samples): {fid:.2f}")
-    return fid
+    return fid, config
 
 
 def compare_fid_scenarios(
@@ -315,8 +343,11 @@ def compare_fid_scenarios(
     max_samples = max_samples or FID_NUM_SAMPLES
     rows = []
     for name in scenario_names:
-        cfg = EXPERIMENTS[name]
-        fid = evaluate_fid_scenario(name, device, max_samples=max_samples)
+        try:
+            fid, cfg = evaluate_fid_scenario(name, device, max_samples=max_samples)
+        except (RuntimeError, FileNotFoundError) as e:
+            print(f"SKIP [{name}]: {e}")
+            continue
         rows.append(
             {
                 "scenario": name,
@@ -472,8 +503,8 @@ def compare_cats_vs_cats_dogs(
     save_sample_grid(imgs_cat, os.path.join(save_dir, "cats_only_model.png"), nrow=8)
     save_sample_grid(imgs_mix, os.path.join(save_dir, "cats_dogs_model.png"), nrow=8)
 
-    fid_cats_only = evaluate_fid_scenario(scenario_cats_only, device)
-    fid_mixed = evaluate_fid_scenario(scenario_mixed, device)
+    fid_cats_only, _ = evaluate_fid_scenario(scenario_cats_only, device)
+    fid_mixed, _ = evaluate_fid_scenario(scenario_mixed, device)
 
     summary = {
         "scenario_cats_only": scenario_cats_only,
